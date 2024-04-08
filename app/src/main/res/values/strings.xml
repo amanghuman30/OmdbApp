@@ -2,4 +2,6 @@
     <string name="app_name">OmdbApp</string>
     <string name="movie_poster_content_desc">Movie poster</string>
     <string name="play_btn_text">Watch</string>
+    <string name="search_placeholder">Search movies…</string>
+
 </resources>

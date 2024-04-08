@@ -12,9 +12,9 @@ class InfoChip(context: Context, attr: AttributeSet? = null) : Chip(context, att
     init {
         chipBackgroundColor = ContextCompat.getColorStateList(context, R.color.black_gen)
         chipStrokeWidth = context.resources.getDimension(R.dimen.chip_stroke_width)
-        setTextColor(ContextCompat.getColor(context,R.color.chip_info_grey))
+        setTextColor(ContextCompat.getColor(context,R.color.grey_gen))
 
-        chipStrokeColor = ContextCompat.getColorStateList(context, R.color.chip_info_grey)
+        chipStrokeColor = ContextCompat.getColorStateList(context, R.color.grey_gen)
         setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
 
     }

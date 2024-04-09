@@ -5,6 +5,10 @@ plugins {
     id 'kotlin-kapt'
 }
 
+def apiPropertiesFile = rootProject.file("api.properties")
+def apiProperties = new Properties()
+apiProperties.load(new FileInputStream(apiPropertiesFile))
+
 android {
     namespace 'com.omdb.app'
     compileSdk 34
@@ -30,6 +34,26 @@ android {
         }
     }
 
+
+
+    productFlavors {
+        dev {
+
+            buildConfigField "String", "APP_HOST_URL", "\"${apiProperties['dev_app_host_url']}\""
+            buildConfigField "String", "API_KEY", apiProperties['DEV_KEY']
+        }
+        qa {
+
+            buildConfigField "String", "APP_HOST_URL", "\"${apiProperties['qa_app_host_url']}\""
+            buildConfigField "String", "API_KEY", apiProperties['QA_KEY']
+        }
+        prod {
+
+            buildConfigField "String", "APP_HOST_URL", "\"${apiProperties['prod_app_host_url']}\""
+            buildConfigField "String", "API_KEY", apiProperties['PROD_KEY']
+        }
+    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -37,6 +61,7 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+    flavorDimensions 'Version1'
 }
 
 dependencies {
@@ -45,9 +70,31 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.11.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    implementation "com.google.dagger:hilt-android:2.44"
-    kapt "com.google.dagger:hilt-compiler:2.44"
 
+    //Dagger hilt
+    implementation "com.google.dagger:hilt-android:2.51.1"
+    kapt "com.google.dagger:hilt-compiler:2.51.1"
+
+    //Retrofit Library
+    def retrofit_version = '2.9.0'
+    implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
+    implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
+    implementation "com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:0.9.2"
+    implementation "com.squareup.okhttp3:logging-interceptor:4.9.1"
+
+    implementation 'com.google.code.gson:gson:2.10.1'
+
+    //coroutines
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1'
+
+    // Coroutine Lifecycle Scopes
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.7.0"
+    implementation "androidx.activity:activity-ktx:1.8.2"
+
+    //Glide
+    implementation 'com.github.bumptech.glide:glide:4.13.2'
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'

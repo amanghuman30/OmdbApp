@@ -20,6 +20,7 @@ class MoviesRepository(private val dataSource: MovieDataSource) : Repository {
         return try {
                 ResultWrapper.Success(apiCall.invoke())
             } catch (throwable: Throwable) {
+                Log.e("Exception in api","${throwable.stackTrace}")
                 when (throwable) {
                     is NoInternetException -> {
                         ResultWrapper.NetworkError()

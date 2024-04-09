@@ -5,6 +5,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.SearchView
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -90,6 +91,7 @@ class HomeActivity : AppCompatActivity() {
                     dividerInsetStart = dimen
                     dividerInsetEnd = dimen
                     dividerThickness = context.resources.getDimension(R.dimen.divider_thickness).toInt()
+                    dividerColor = ContextCompat.getColor(this@HomeActivity,R.color.grey_gen)
                 }
                 addItemDecoration(divider)
             }

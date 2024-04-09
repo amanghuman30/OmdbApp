@@ -3,7 +3,6 @@ package com.omdb.app.source
 import android.util.Log
 import com.omdb.app.BuildConfig
 import com.omdb.app.api.MovieSearchApi
-import com.omdb.app.api.ResultWrapper
 import com.omdb.app.models.MoviesResponse
 import javax.inject.Singleton
 

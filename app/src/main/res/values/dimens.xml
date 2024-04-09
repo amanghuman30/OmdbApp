@@ -2,4 +2,8 @@
 <resources>
     <dimen name="chip_stroke_width">1dp</dimen>
 
+    <dimen name="divider_margin">16dp</dimen>
+
+    <dimen name="divider_thickness">0.5dp</dimen>
+
 </resources>

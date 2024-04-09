@@ -1,17 +1,21 @@
 package com.omdb.app.ui
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.SearchView
-import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.divider.MaterialDividerItemDecoration
 import com.omdb.app.R
 import com.omdb.app.api.ResultWrapper
 import com.omdb.app.databinding.ActivityHomeBinding
 import com.omdb.app.models.MoviesResponse
+import com.omdb.app.ui.adapters.MoviesSearchAdapter
 import com.omdb.app.util.gone
+import com.omdb.app.util.hideSoftKeyBoard
 import com.omdb.app.util.visible
 import com.omdb.app.viewmodels.HomeViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -22,6 +26,7 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
+
 @AndroidEntryPoint
 class HomeActivity : AppCompatActivity() {
 
@@ -29,6 +34,7 @@ class HomeActivity : AppCompatActivity() {
     private val viewModel : HomeViewModel by viewModels()
     private var searchQueryFlow: MutableStateFlow<String>? = null
     private val SEARCH_QUERY_DEBOUNCE_TIME: Long = 100
+    private lateinit var moviesSearchAdapter: MoviesSearchAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
@@ -40,31 +46,54 @@ class HomeActivity : AppCompatActivity() {
 
         setupViews()
         setupListeners()
-
     }
 
     private fun setupViews() {
 
-        binding.movieSv.setOnQueryTextListener(object: SearchView.OnQueryTextListener{
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                return true
-            }
+        binding.apply {
+            movieSv.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                override fun onQueryTextSubmit(query: String?): Boolean {
+                    return true
+                }
 
-            override fun onQueryTextChange(newText: String?): Boolean {
-                newText?.trim()?.let { text ->
-                    lifecycleScope.launch {
-                        searchQueryFlow?.let {
-                            searchQueryFlow?.emit(text)
-                        } ?: run {
-                            searchQueryFlow = MutableStateFlow(text)
-                            setupSearchQueryFlow()
+                override fun onQueryTextChange(newText: String?): Boolean {
+                    newText?.trim()?.takeIf { it.isNotEmpty() }?.let { text ->
+                        lifecycleScope.launch {
+                            searchQueryFlow?.let {
+                                searchQueryFlow?.emit(text)
+                            } ?: run {
+                                searchQueryFlow = MutableStateFlow(text)
+                                setupSearchQueryFlow()
+                            }
                         }
                     }
+                    return true
                 }
-                return true
-            }
-        })
+            })
 
+            moviesSearchAdapter = MoviesSearchAdapter()
+
+            searchMoviesRV.apply {
+                layoutManager = LinearLayoutManager(this@HomeActivity)
+                adapter = moviesSearchAdapter
+
+                addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                        super.onScrolled(recyclerView, dx, dy)
+                        if (dy != 0)
+                            recyclerView.hideSoftKeyBoard()
+                    }
+                })
+
+                val divider = MaterialDividerItemDecoration(this@HomeActivity, LinearLayoutManager.VERTICAL).apply {
+                    val dimen = context.resources.getDimension(R.dimen.divider_margin).toInt()
+                    dividerInsetStart = dimen
+                    dividerInsetEnd = dimen
+                    dividerThickness = context.resources.getDimension(R.dimen.divider_thickness).toInt()
+                }
+                addItemDecoration(divider)
+            }
+        }
     }
 
     private fun setupListeners() {
@@ -93,6 +122,9 @@ class HomeActivity : AppCompatActivity() {
                     } ?: run {
                         showMoviesRecycler()
                         //set recycler data here
+                        response.data?.Search?.let {
+                            moviesSearchAdapter.differ.submitList(it)
+                        }
                     }
                 }
 
@@ -111,6 +143,7 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun showEmptyErrorView() {
+
         binding.apply {
             searchMoviesRV.gone()
             searchIv.visible()

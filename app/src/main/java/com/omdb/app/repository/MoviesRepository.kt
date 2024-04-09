@@ -25,7 +25,7 @@ class MoviesRepository(private val dataSource: MovieDataSource) : Repository {
                         ResultWrapper.NetworkError()
                     }
                     else -> {
-                        ResultWrapper.Error( "Unknown error", null)
+                        ResultWrapper.Error( "", null)
                     }
                 }
             }

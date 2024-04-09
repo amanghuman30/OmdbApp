@@ -4,4 +4,7 @@
     <string name="play_btn_text">Watch</string>
     <string name="search_placeholder">Search movies…</string>
 
+    <string name="something_went_wrong_error">Uh oh!\n Something went wrong.</string>
+    <string name="msg_no_internet">Please turn on your internet connection.</string>
+
 </resources>

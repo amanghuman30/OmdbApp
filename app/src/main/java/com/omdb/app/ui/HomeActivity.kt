@@ -5,8 +5,14 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.SearchView
+import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
+import com.omdb.app.R
+import com.omdb.app.api.ResultWrapper
 import com.omdb.app.databinding.ActivityHomeBinding
+import com.omdb.app.models.MoviesResponse
+import com.omdb.app.util.gone
+import com.omdb.app.util.visible
 import com.omdb.app.viewmodels.HomeViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -33,6 +39,8 @@ class HomeActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         setupViews()
+        setupListeners()
+
     }
 
     private fun setupViews() {
@@ -57,6 +65,65 @@ class HomeActivity : AppCompatActivity() {
             }
         })
 
+    }
+
+    private fun setupListeners() {
+
+        viewModel.searchResults.observe(this) {
+            handleSearchResult(it)
+        }
+
+    }
+
+    private fun handleSearchResult(response : ResultWrapper<MoviesResponse>) {
+
+        binding.apply {
+
+            moviesPb.gone()
+
+            when (response) {
+                is ResultWrapper.Loading -> {
+                    moviesPb.visible()
+                }
+                is ResultWrapper.Success -> {
+
+                    response.data?.Error?.let {
+                        showEmptyErrorView()
+                        emptyErrorTv.text = it
+                    } ?: run {
+                        showMoviesRecycler()
+                        //set recycler data here
+                    }
+                }
+
+                is ResultWrapper.NetworkError -> {
+                    showEmptyErrorView()
+                    emptyErrorTv.text = getString(R.string.msg_no_internet)
+                }
+
+                is ResultWrapper.Error -> {
+                    showEmptyErrorView()
+                    emptyErrorTv.text = getString(R.string.something_went_wrong_error)
+                }
+            }
+        }
+
+    }
+
+    private fun showEmptyErrorView() {
+        binding.apply {
+            searchMoviesRV.gone()
+            searchIv.visible()
+            emptyErrorTv.visible()
+        }
+    }
+
+    private fun showMoviesRecycler() {
+        binding.apply {
+            searchMoviesRV.visible()
+            searchIv.gone()
+            emptyErrorTv.gone()
+        }
     }
 
     /**

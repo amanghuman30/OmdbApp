@@ -1,5 +1,6 @@
 package com.omdb.app.api
 
+import com.omdb.app.BuildConfig
 import com.omdb.app.util.NetworkHelper
 import com.omdb.app.util.NoInternetException
 import okhttp3.Interceptor
@@ -16,7 +17,7 @@ import javax.inject.Singleton
 class RetrofitBuilder @Inject constructor(private val networkHelper: NetworkHelper) {
 
 
-    private val retrofit by lazy {
+    val retrofit: Retrofit by lazy {
 
         val logging = HttpLoggingInterceptor()
         logging.setLevel(HttpLoggingInterceptor.Level.BODY)
@@ -29,11 +30,13 @@ class RetrofitBuilder @Inject constructor(private val networkHelper: NetworkHelp
             .build()
 
         Retrofit.Builder()
-            .baseUrl("")
+            .baseUrl(BuildConfig.APP_HOST_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .client(client)
             .build()
     }
+
+
 
     class NetworkConnectionInterceptor(private val netHelper: NetworkHelper) : Interceptor {
         override fun intercept(chain: Interceptor.Chain): Response {
